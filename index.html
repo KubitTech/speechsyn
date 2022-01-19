@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Baris Gul -- SR</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="css/bootstrap.css">
+</head>
+<body>
+  <div class="container">
+    <div class="row justify-content-center">
+    <div class="col-6">
+      <h4>SPEECH RECOGNATION</h4>
+      <p></p>
+      <img src="img/microphone-noir.png" height="50" width="50"/>
+      <div>
+        <p id="selectedLang"></p>
+      </div>
+
+      <div class="words" contenteditable></div>
+      <div style="width:400px;">
+        <select id="lang" class="form-control" onselect="selectLang()">
+          <option value="0">...</option>
+          <option value="fr-FR">Français</option>
+          <option value="en-US">Anglais</option>
+        </select>
+        <div class="row">
+          <hr>
+        </div>
+        <button type="button" onclick="selectLangByAction()">Appliquer</button>
+      </div>
+
+    </div>
+      <div class="col-1">
+      </div>
+    <div class="col-5">
+      <h4>TEXT TO SPEECH</h4>
+      <img src="img/Speaker_Icon.svg.png" height="50" width="50"/>
+      <p style="padding-top: 50px"></p>
+      <div class="row" contenteditable>
+       <input type="text" id="text-to-speech" placeholder="Entrez du texte pour parler..." required/>
+      </div>
+      <p>
+        <select id="langPar" class="form-control" onselect="selectLang()">
+          <option value="0">...</option>
+          <option value="fr-FR">Français</option>
+          <option value="en-US">Anglais</option>
+        </select>
+      </p>
+      <p></p>
+      <div class="row">
+        <hr>
+      </div>
+      <div><button class="btn-info" type="button" onclick="selectLang()">Parler</button></div>
+      <div><small>REMARQUE : Saisissez du texte et cliquez sur le bouton Parler.</small></div>
+    </div>
+  </div>
+
+  <div class="modal-footer small">
+    Conception et Programmation : Baris Gul
+  </div>
+  </div>
+  <script>
+   //on prends select valeur
+    function selectLangByAction() {
+        var x = document.getElementById("lang").value;
+        document.getElementById("selectedLang").innerHTML = x;
+        StartRecogSpeech(x);
+      //  return x;
+    }
+   function selectLang() {
+       var idLang = document.getElementById("langPar").value;
+       //document.getElementById("selectedLang").innerHTML = x;
+       if(idLang!=null)
+        textToAudioStart(idLang);
+       //StartRecogSpeech(x);
+       //return x;
+   }
+    function StartRecogSpeech(idLang)
+    {
+        //si select valeur pas null, start recog
+        window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.interimResults = true;
+        let selLang = idLang;
+        //On prend valeur de select si null pas
+        //alert(selLang);
+
+        recognition.lang = 'en-US';
+        if(idLang!='0')
+        {
+            //alert(selectLang());
+            document.getElementById("selectedLang").innerHTML = 'Selected lang  : ' +  selLang;
+
+        }
+
+        let p = document.createElement('p');
+        const words = document.querySelector('.words');
+        words.appendChild(p);
+
+        recognition.addEventListener('result', e => {
+            const transcript = Array.from(e.results)
+                .map(result => result[0])
+                .map(result => result.transcript)
+                .join('');
+
+            const poopScript = transcript.replace(/poop|poo|shit|fuck|dump/gi, '💩');
+            p.textContent = poopScript;
+
+            if (e.results[0].isFinal) {
+                p = document.createElement('p');
+                words.appendChild(p);
+            }
+        });
+
+        recognition.addEventListener('end', recognition.start);
+        recognition.start();
+    }
+   function textToAudioStart(idLang) {
+       let msg = document.getElementById("text-to-speech").value;
+       let speech = new SpeechSynthesisUtterance();
+       speech.lang = idLang;
+       speech.text = msg;
+       speech.volume = 1;
+       speech.rate = 1;
+       speech.pitch = 1;
+       window.speechSynthesis.speak(speech);
+   }
+
+</script>
+</body>
+</html>
